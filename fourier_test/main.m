@@ -1,7 +1,7 @@
 
 % Change this params to see changes
-noise_ampl = 2.0;               % noise amplitude
-freq = 50;                   % real freq of signal
+noise_ampl = 10.0;               % noise amplitude
+freq = 100;                   % real freq of signal
 ampl = 3;                     % amplitude of signal
 
 
@@ -46,7 +46,7 @@ signal_frequency = signal_frequency - 1
 X_rec = ifft(Y,n,dim);
 
 
-value_to_zero = max( real(Y) ) / 2;
+value_to_zero = max( real(Y) ) / 1.5;
 fY = Y;
 fY(find(Y < value_to_zero)) = 0;
 
@@ -68,10 +68,10 @@ hold on
 plot(t(1:100), real_vals(1:100))
 hold off
 legend('noisy signal', 'real signal')
-title(['Row ',num2str(i),' in the Time Domain'])
+title('signal visualization')
 subplot(2,1,2)
 plot(frequencies, spec)
-title(['Row ',num2str(i),' in the Frequency Domain'])
+title('frequency analysis')
 
 
 figure(2)
@@ -89,5 +89,5 @@ hold on
 plot(t(1:100),real_vals(1:100),'-')
 hold off
 legend(sprintf('reconstructed signal, error %f',err_fit_normalized), 'real signal')
-title(['Row ',num2str(i),' in the Time Domain'])
+title('Signal reconstruction')
 
