@@ -1,20 +1,21 @@
+
+% Change this params to see changes
+noise_ampl = 2.0;               % noise amplitude
+freq = 50;                   % real freq of signal
+ampl = 3;                     % amplitude of signal
+
+
+% Data generation specifications
 Fs = 1000;                    % Sampling frequency
 T = 1/Fs;                     % Sampling period
 L = 1000;                     % Length of signal
-t = (0:L-1)*T;                % Time vector
-noise_ampl = 1.0;               % noise amplitude
 
 
-noise = noise_ampl * randn(size(t)); % Noise vector
-
-% Create a matrix where each row represents a cosine wave with scaled frequency. The result, X, is a 3-by-1000 matrix.
-% The first row has a wave frequency of 50, the second row has a wave frequency of 150,
-% and the third row has a wave frequency of 300.
-
-real_vals = cos(2*pi*50*t);
-
-X = real_vals + noise;          % First row wave
-% X = real_vals
+% create time vector and cosine function with noise
+t = (0:L-1)*T;                          % Time vector
+noise = noise_ampl * randn(size(t));    % Noise vector
+real_vals = ampl*cos(2*pi*freq*t);
+X = real_vals + noise;
 
 
 % For algorithm performance purposes, fft allows you to pad the input with trailing zeros.
@@ -39,26 +40,23 @@ spec = P1(1:n/2);
 
 % get frequency of signal
 [argvalue, signal_frequency] = max(spec);
-signal_frequency
-
-
+% dont know why
+signal_frequency = signal_frequency - 1
 
 X_rec = ifft(Y,n,dim);
 
-value_to_zero = 100;
 
-%% better with find
-% fY = fix( Y/value_to_zero )*value_to_zero;
-
+value_to_zero = max( real(Y) ) / 2;
 fY = Y;
 fY(find(Y < value_to_zero)) = 0;
-
-max( Y )
-max( fY )
 
 % fY = Y
 ifY = ifft(fY);
 cy = real(ifY);
+
+% error
+err_fit = norm(cy - real_vals)
+err_fit_normalized = err_fit/L
 
 %%% PLOTS
 
@@ -66,6 +64,10 @@ figure(1)
 % Plot the first 100 entries from each row of X in a single figure in order and compare their frequencies.
 subplot(2,1,1)
 plot(t(1:100), X(1:100))
+hold on
+plot(t(1:100), real_vals(1:100))
+hold off
+legend('noisy signal', 'real signal')
 title(['Row ',num2str(i),' in the Time Domain'])
 subplot(2,1,2)
 plot(frequencies, spec)
@@ -73,7 +75,6 @@ title(['Row ',num2str(i),' in the Frequency Domain'])
 
 
 figure(2)
-
 subplot(2,1,1)
 plot(t,real(Y),'--')
 hold on
@@ -83,10 +84,10 @@ title('filter fft')
 legend('fft with noise', 'fft filtered')
 
 subplot(2,1,2)
-plot(t(1:100),cy(1:100),'--')
+plot(t(1:100),cy(1:100),'-x')
 hold on
 plot(t(1:100),real_vals(1:100),'-')
 hold off
-legend('reconstructed signal', 'real signal')
+legend(sprintf('reconstructed signal, error %f',err_fit_normalized), 'real signal')
 title(['Row ',num2str(i),' in the Time Domain'])
 
